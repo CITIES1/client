@@ -10,13 +10,20 @@ public class ChatData
     public string id;
     public string msg;
 };
-public class UserData
+public struct UserData
 {
     public string id;
     public int current_life;
     public int max_life;
     public string character;
 };
+public struct AttackData
+{
+    public string from;
+    public string to;
+    public int damage;
+};
+
 
 public class Controller : MonoBehaviour
 {
@@ -30,7 +37,8 @@ public class Controller : MonoBehaviour
     protected List<string> chatLog = new List<string>();
     
     public List<UserData> users = new List<UserData>();
-    public UserData myUser;
+
+    public static UserData myUser;
     
     void Destroy()
     {
@@ -62,7 +70,7 @@ public class Controller : MonoBehaviour
                 chatLog.Clear();
             }
         }*/
-        Debug.Log(users[0].id);
+        //Debug.Log(users);
     }
 
     void DoOpen()
@@ -86,7 +94,10 @@ public class Controller : MonoBehaviour
                 Debug.Log("AAAAA");
                 Debug.Log(str);
                 Debug.Log(receivedUser);
-                myUser = receivedUser;
+                Controller.myUser.id = receivedUser.id;
+                Controller.myUser.current_life = receivedUser.current_life;
+                Controller.myUser.max_life = receivedUser.max_life;
+                Debug.Log(Controller.myUser);
             });
             socket.On("users_update", (data) => {
                 string str = data.ToString();
@@ -126,5 +137,19 @@ public class Controller : MonoBehaviour
         {
             socket.Emit("chat", str);
         }
+    }
+    public void Attack(string id)
+    {
+        Debug.Log("attack:");
+        Debug.Log(id);
+        Debug.Log(Controller.myUser.id);
+        AttackData attack;
+        attack.from = Controller.myUser.id;
+        attack.to = Controller.myUser.id;
+        attack.damage = 5;
+        
+        string attackStr = JsonConvert.SerializeObject(attack);
+        Debug.Log(attackStr);
+        socket.Emit("attack", attackStr);
     }
 }
