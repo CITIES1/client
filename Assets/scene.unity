@@ -295,7 +295,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b55cadcf985101541a563bfefc1bfa9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serverURL: http://192.168.1.35:4444
+  serverURL: http://192.168.1.34:4444
   uiInput: {fileID: 0}
   uiSend: {fileID: 0}
   uiChatLog: {fileID: 0}

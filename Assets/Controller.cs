@@ -10,10 +10,17 @@ public class ChatData
     public string id;
     public string msg;
 };
+public class UserData
+{
+    public string id;
+    public int current_life;
+    public int max_life;
+    public string character;
+};
 
 public class Controller : MonoBehaviour
 {
-    public string serverURL = "http://192.168.1.35:4444";
+    public string serverURL = "http://192.168.1.34:4444";
 
     public InputField uiInput = null;
     public Button uiSend = null;
@@ -21,7 +28,10 @@ public class Controller : MonoBehaviour
 
     protected Socket socket = null;
     protected List<string> chatLog = new List<string>();
-
+    
+    public List<UserData> users = new List<UserData>();
+    public UserData myUser;
+    
     void Destroy()
     {
         DoClose();
@@ -30,19 +40,16 @@ public class Controller : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        DoOpen();
 
-        uiSend.onClick.AddListener(() => {
-            SendChat(uiInput.text);
-            uiInput.text = "";
-            uiInput.ActivateInputField();
-        });
+        Debug.Log("Start()");
+        DoOpen();
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        lock (chatLog)
+        /*lock (chatLog)
         {
             if (chatLog.Count > 0)
             {
@@ -54,20 +61,40 @@ public class Controller : MonoBehaviour
                 uiChatLog.text = str;
                 chatLog.Clear();
             }
-        }
+        }*/
+        Debug.Log(users[0].id);
     }
 
     void DoOpen()
     {
+        Debug.Log("DoOpen");
         if (socket == null)
         {
             socket = IO.Socket(serverURL);
+            Debug.Log(socket);
             socket.On(Socket.EVENT_CONNECT, () => {
-                lock (chatLog)
+                Debug.Log("connected!");
+                /*lock (chatLog)
                 {
                     // Access to Unity UI is not allowed in a background thread, so let's put into a shared variable
                     chatLog.Add("Socket.IO connected.");
-                }
+                }*/
+            });
+            socket.On("user", (data) => {
+                string str = data.ToString();
+                UserData receivedUser = JsonConvert.DeserializeObject<UserData>(str);
+                Debug.Log("AAAAA");
+                Debug.Log(str);
+                Debug.Log(receivedUser);
+                myUser = receivedUser;
+            });
+            socket.On("users_update", (data) => {
+                string str = data.ToString();
+                List<UserData> updateUsers = JsonConvert.DeserializeObject < List<UserData>>(str);
+                Debug.Log("AAAAA");
+                Debug.Log(str);
+                Debug.Log(updateUsers);
+                users = updateUsers;
             });
             socket.On("chat", (data) => {
                 string str = data.ToString();
