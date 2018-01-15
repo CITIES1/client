@@ -27,7 +27,7 @@ public struct AttackData
 
 public class Controller : MonoBehaviour
 {
-    public string serverURL = "http://192.168.1.35:4444";
+    public string serverURL = "http://192.168.1.36:4444";
 
     public InputField uiInput = null;
     public Button uiSend = null;
@@ -39,8 +39,10 @@ public class Controller : MonoBehaviour
     public List<UserData> users = new List<UserData>();
 
     public static UserData myUser;
+    public static UserData opponent;
 
-    private Text txtRef;
+    private Text userTxt;
+    private Text opponentTxt;
 
     void Destroy()
     {
@@ -61,8 +63,12 @@ public class Controller : MonoBehaviour
     void Update()
     {
         //update the myUser.current_life in the text view
-        txtRef = GameObject.Find("LifeTxt").GetComponent<Text>();
-        txtRef.text = Controller.myUser.current_life.ToString();
+        userTxt = GameObject.Find("LifeTxt").GetComponent<Text>();
+        userTxt.text = Controller.myUser.current_life.ToString();
+
+        //update opponent.current_life
+        opponentTxt = GameObject.Find("OpponentLifeTxt").GetComponent<Text>();
+        opponentTxt.text = Controller.opponent.current_life.ToString();
 
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
         {
@@ -112,6 +118,9 @@ public class Controller : MonoBehaviour
                     if(user.id == Controller.myUser.id)
                     {
                         Controller.myUser = user;
+                    } else
+                    {
+                        Controller.opponent = user;
                     }
                 }
             });
@@ -153,7 +162,8 @@ public class Controller : MonoBehaviour
         Debug.Log(Controller.myUser.id);
         AttackData attack;
         attack.from = Controller.myUser.id;
-        attack.to = Controller.myUser.id;
+
+        attack.to = Controller.opponent.id;
         attack.damage = 5;
         
         string attackStr = JsonConvert.SerializeObject(attack);
