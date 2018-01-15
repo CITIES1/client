@@ -27,7 +27,7 @@ public struct AttackData
 
 public class Controller : MonoBehaviour
 {
-    public string serverURL = "http://192.168.1.34:4444";
+    public string serverURL = "http://192.168.1.35:4444";
 
     public InputField uiInput = null;
     public Button uiSend = null;
@@ -55,22 +55,17 @@ public class Controller : MonoBehaviour
     }
 
     // Update is called once per frame
+    public float speed = 0.1F;
     void Update()
     {
-        /*lock (chatLog)
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
         {
-            if (chatLog.Count > 0)
-            {
-                string str = uiChatLog.text;
-                foreach (var s in chatLog)
-                {
-                    str = str + "\n" + s;
-                }
-                uiChatLog.text = str;
-                chatLog.Clear();
-            }
-        }*/
-        //Debug.Log(users);
+            // Get movement of the finger since last frame
+            Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
+
+            // Move object across XY plane
+            transform.Translate(-touchDeltaPosition.x * speed, -touchDeltaPosition.y * speed, 0);
+        }
     }
 
     void DoOpen()
