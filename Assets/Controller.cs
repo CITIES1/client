@@ -39,7 +39,9 @@ public class Controller : MonoBehaviour
     public List<UserData> users = new List<UserData>();
 
     public static UserData myUser;
-    
+
+    private Text txtRef;
+
     void Destroy()
     {
         DoClose();
@@ -58,6 +60,10 @@ public class Controller : MonoBehaviour
     public float speed = 0.1F;
     void Update()
     {
+        //update the myUser.current_life in the text view
+        txtRef = GameObject.Find("LifeTxt").GetComponent<Text>();
+        txtRef.text = Controller.myUser.current_life.ToString();
+
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
         {
             // Get movement of the finger since last frame
@@ -101,6 +107,13 @@ public class Controller : MonoBehaviour
                 Debug.Log(str);
                 Debug.Log(updateUsers);
                 users = updateUsers;
+                foreach (UserData user in users)
+                {
+                    if(user.id == Controller.myUser.id)
+                    {
+                        Controller.myUser = user;
+                    }
+                }
             });
             socket.On("chat", (data) => {
                 string str = data.ToString();
