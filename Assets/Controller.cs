@@ -36,13 +36,15 @@ public class Controller : MonoBehaviour
     protected Socket socket = null;
     protected List<string> chatLog = new List<string>();
     
-    public List<UserData> users = new List<UserData>();
+    public static List<UserData> users = new List<UserData>();
 
     public static UserData myUser;
     public static UserData opponent;
 
-    private Text userTxt;
-    private Text opponentTxt;
+    public static Text userTxt;
+    public static Text opponentTxt;
+    
+
 
     void Destroy()
     {
@@ -52,7 +54,8 @@ public class Controller : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
+        Controller.userTxt = GameObject.Find("LifeTxt").GetComponent<Text>();
+        Controller.opponentTxt = GameObject.Find("OpponentLifeTxt").GetComponent<Text>();
         Debug.Log("Start()");
         DoOpen();
         
@@ -63,21 +66,19 @@ public class Controller : MonoBehaviour
     void Update()
     {
         //update the myUser.current_life in the text view
-        userTxt = GameObject.Find("LifeTxt").GetComponent<Text>();
-        userTxt.text = Controller.myUser.current_life.ToString();
+        Controller.userTxt.text = "You: " + Controller.myUser.current_life.ToString();
 
         //update opponent.current_life
-        opponentTxt = GameObject.Find("OpponentLifeTxt").GetComponent<Text>();
-        opponentTxt.text = Controller.opponent.current_life.ToString();
+        Controller.opponentTxt.text = "Enemy: " + Controller.opponent.current_life.ToString();
 
-        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
+        /*if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
         {
             // Get movement of the finger since last frame
             Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
 
             // Move object across XY plane
             transform.Translate(-touchDeltaPosition.x * speed, -touchDeltaPosition.y * speed, 0);
-        }
+        }*/
     }
 
     void DoOpen()
@@ -105,6 +106,8 @@ public class Controller : MonoBehaviour
                 Controller.myUser.current_life = receivedUser.current_life;
                 Controller.myUser.max_life = receivedUser.max_life;
                 Debug.Log(Controller.myUser);
+
+                //Controller.userTxt.text = Controller.myUser.current_life.ToString() + "test";
             });
             socket.On("users_update", (data) => {
                 string str = data.ToString();
@@ -112,8 +115,8 @@ public class Controller : MonoBehaviour
                 Debug.Log("AAAAA");
                 Debug.Log(str);
                 Debug.Log(updateUsers);
-                users = updateUsers;
-                foreach (UserData user in users)
+                Controller.users = updateUsers;
+                foreach (UserData user in Controller.users)
                 {
                     if(user.id == Controller.myUser.id)
                     {
@@ -164,7 +167,7 @@ public class Controller : MonoBehaviour
         attack.from = Controller.myUser.id;
 
         attack.to = Controller.opponent.id;
-        attack.damage = 5;
+        attack.damage = 1;
         
         string attackStr = JsonConvert.SerializeObject(attack);
         Debug.Log(attackStr);
